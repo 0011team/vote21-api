@@ -107,13 +107,53 @@ class LawmakerPushView(APIView):
     permission_classes = (permissions.AllowAny,)
     def get(self, request, format=None):
         
-        # # csv_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/bills/peoplepower21/"
+        # csv_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/bills/peoplepower21/"
+        json_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/bills/json/20/"
         # nec_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/nec/candidates/"
-        json_dir = "/new-crawlers/bills/json/20"
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        with open( json_dir + '/2004092.json', newline='') as json_file:
-            json_data = json.load(json_file)
+        
+        # with open( json_dir + '/2024795.json', newline='') as json_file:
+            # json_data = json.load(json_file)
 
-        return Response({"data": json_data })
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # persons = Person.objects.all()
+        # for p in persons:
+        #     active = p.active 
+        #     active.major_bill = []
+        #     active.save()
+
+        # with open( base_dir + '/20_early.csv', newline='') as csv_file, open( base_dir + '/20_late.csv', newline='') as csv_file2:
+        #     reader1 = list(csv.reader(csv_file, delimiter=',', ))
+        #     reader2 = list(csv.reader(csv_file2, delimiter=',', ))
+
+        #     reader = reader1[1:]
+
+        #     names = reader1[0][5:]
+        #     headers = reader1[1][5:]
+            
+        #     # print (names, headers)
+        #     for r in reader[1:]:
+        #         arr = r[5:]
+        #         print (r[0], r[5:])
+
+        #         r[0] = r[0].strip()
+        #         if (r[0]=="金成泰" or r[0]=="金聖泰" or r[0] == "崔敬煥" or r[0] == "崔炅煥"):
+        #             p = Person.objects.get(name_cn=r[0])
+        #         else:
+        #             p = Person.objects.get(name=r[0])
+        #         active = p.active 
+        #         info = active.major_bill
+                
+        #         for i, v in enumerate(headers):
+        #             val = {
+        #                 "bill_id": str(v), 
+        #                 "title": names[i],
+        #                 "vote": arr[i]
+        #             }
+        #             info.append(val)
+        #         active.major_bill = info
+        #         active.save()
+
+        return Response({"data": [] })
 
 

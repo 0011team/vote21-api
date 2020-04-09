@@ -30,7 +30,11 @@ class ActiveLawMaker(models.Model):
     peoplepower21_url = models.CharField(max_length=100, verbose_name="재산", blank=True)
     ranking = JSONField(verbose_name="랭킹", blank=True, null=True)
 
-    analysis_info = JSONField(verbose_name="대표발의법안분석", default={})
+    analysis_info = JSONField(verbose_name="대표발의 법안분석", blank=True, null=True)
+    # major_bill_info = JSONField(verbose_name="주요법안 찬반투표", blank=True, null=True)
+    major_bill = ArrayField(
+        JSONField()
+    )
     
     # # 발이의안 정보는 여기 
     # def __str__(self):
@@ -145,8 +149,6 @@ class Candidacy(models.Model):
 
     conviction_count = models.CharField(max_length=10, verbose_name="전과", blank=True)
     candidacy_count = models.CharField(max_length=12, verbose_name="현재채납급액", blank=True)
-    
-    
     
     type = models.CharField(
         max_length=10,

@@ -100,3 +100,6 @@ static/
 
 # test csv 
 *csv
+
+# .dstore
+*.DS_Store
