@@ -6,7 +6,8 @@ import environ
 # Load operating system env variables and prepare to use them
 env = environ.Env()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
 
 # .env file, should load only in development environment
 env_file = join(BASE_DIR, ".env")
