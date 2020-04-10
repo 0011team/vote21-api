@@ -27,7 +27,6 @@ class LawmakerView(APIView):
     def get(self, request, format=None):
 
         # persons = Person.objects.all()
-        base_dir = os.path.dirname(os.path.abspath(__file__))
             
         # 정보 가져오기
         query_district = self.request.query_params.get('district', None)
@@ -36,15 +35,16 @@ class LawmakerView(APIView):
         district = District.objects.get(
             name=query_district.strip(), 
         )
+
         if ( lawmaker_district is not None):
             person = Person.objects.get(
                 district=district,
                 name=lawmaker_district
             )
         else:
-            person = Person.objects.get(
+            person = Person.objects.filter(
                 district=district,
-            )
+            )[1]
         s = PersonSerializer(person)
         return Response(s.data, status.HTTP_200_OK)
             
