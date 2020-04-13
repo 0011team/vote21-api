@@ -1,7 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+
 from .models import Person, ActiveLawMaker, Candidacy
 import re
 import datetime
+import json
 
 class PersonSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
@@ -39,10 +42,14 @@ class PersonSerializer(serializers.ModelSerializer):
         return bills_count
     
     def get_birthday(self, obj):
-        f = re.split('[\(/\)]', obj.birthday)
-        now = datetime.datetime.now()
-        age = now.year+1-int(f[0])
-        birthday = '{}/{}/{}({}세)'.format(f[0], f[1], f[2], age) 
+        try:
+            f = re.split('[\(/\)]', obj.birthday)
+            now = datetime.datetime.now()
+            age = now.year+1-int(f[0])
+            birthday = '{}/{}/{}({}세)'.format(f[0], f[1], f[2], age) 
+        except:
+            birthday = obj.birthday
+
         return birthday
 
 class SummaryPersonserializer(serializers.ModelSerializer):
@@ -90,4 +97,32 @@ class Candidacyserializer(serializers.ModelSerializer):
     def get_payed_tax(self, obj):
         return format(int(obj.payed_tax.replace(",", ""))*1000, ',d')
 
+
+class Rankserializer(serializers.ModelSerializer):
+    lawmaker = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ActiveLawMaker
+        fields = ('ranking', 'lawmaker')
+
+    def get_lawmaker(self, obj):
+        try:
+            lawmaker = Person.objects.get(active=obj) 
+            p = PersonRankserializer(lawmaker)
+            return p.data
+        except ObjectDoesNotExist: 
+            return json.dumps({})
+
+
+class PersonRankserializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
     
+    class Meta:
+        model = Person
+        fields = ('name', 'party', 'image_url', 'district')
+        depth = 1
+
+    def get_image_url(self, obj):
+        assembly_url = 'http://www.rokps.or.kr'
+        img_url = f'{assembly_url}{obj.image_url}'
+        return img_url
