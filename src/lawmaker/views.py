@@ -1,12 +1,15 @@
 from django.shortcuts import render
+from django.db.models.expressions import F, RawSQL
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework import pagination
+
 
 from .models import Person, ActiveLawMaker, Candidacy
 from district.models import District, City
-from .serializers import PersonSerializer, SummaryPersonserializer, SummaryCandidacyserializer, Candidacyserializer
+from .serializers import PersonSerializer, SummaryPersonserializer, SummaryCandidacyserializer, Candidacyserializer, Rankserializer
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
@@ -17,18 +20,28 @@ import requests
 import json
 
 
+def sort_query(category, page=1):
+    qs = ActiveLawMaker.objects.annotate(
+        _property=RawSQL("ranking->'{}'->'ranking'".format(category), [])
+    ).order_by('_property')[:100]
+    return qs
+        
+# 페이지네이션 추가
+class QueryPagination(pagination.PageNumberPagination):
+    page_size_query_param = 'page_size'
+    page_size = 10
+    max_page_size = 10
+
+
 class LawmakerView(APIView):
     """
         지역구명을 조회하는  API 
+        해당 지역구의 의원 정보 가져오기 
     """
 
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
-
-        # persons = Person.objects.all()
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-            
         # 정보 가져오기
         query_district = self.request.query_params.get('district', None)
         lawmaker_district = self.request.query_params.get('name', None)
@@ -36,6 +49,7 @@ class LawmakerView(APIView):
         district = District.objects.get(
             name=query_district.strip(), 
         )
+
         if ( lawmaker_district is not None):
             person = Person.objects.get(
                 district=district,
@@ -51,7 +65,9 @@ class LawmakerView(APIView):
         
 class LawmakerSummaryView(APIView):
     """
-        지역구에 따른 요약정보 공유 
+        지역구의원의 요약정보
+        20대 현역 의원 요약 정보 
+        21대 의원 후보 요약 정보
     """
     permission_classes = (permissions.AllowAny,)
     def get(self, request, format=None):
@@ -80,7 +96,8 @@ class LawmakerSummaryView(APIView):
 
 class CandidateView(APIView):
     """
-        지역구에 따른 요약정보 공유 
+        지역구 출마 후보의 정보  
+        21대 의원 후보의 정보
     """
     permission_classes = (permissions.AllowAny,)
     def get(self, request, format=None):
@@ -98,62 +115,30 @@ class CandidateView(APIView):
             c = Candidacyserializer(candidate)
         return Response(c.data)
 
+class LawmakerRankView(APIView):
+    """
+        랭킹보드 정보
+    """
+
+    permission_classes = (permissions.AllowAny,)
+    pagination_class = QueryPagination
+    def get(self, request, format=None):
+        category = self.request.query_params.get('category', None)
+        if (category is not None):
+            
+            qs = sort_query(category, 1)
+            r = Rankserializer(qs, many=True)
+        else:
+            actives = ActiveLawMaker.objects.filter(ranking__isnull=False)[:50]
+        return Response(r.data)
+
 
 class LawmakerPushView(APIView):
     """
-        지역구명을 조회하는  API 
+        테스트용
     """
 
     permission_classes = (permissions.AllowAny,)
     def get(self, request, format=None):
-        
-        # csv_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/bills/peoplepower21/"
-        json_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/bills/json/20/"
-        # nec_dir = "/Users/donggeunyi/backup_by_dong/PycharmProjects/new-crawlers/nec/candidates/"
-        
-        # with open( json_dir + '/2024795.json', newline='') as json_file:
-            # json_data = json.load(json_file)
-
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        
-        # persons = Person.objects.all()
-        # for p in persons:
-        #     active = p.active 
-        #     active.major_bill = []
-        #     active.save()
-
-        # with open( base_dir + '/20_early.csv', newline='') as csv_file, open( base_dir + '/20_late.csv', newline='') as csv_file2:
-        #     reader1 = list(csv.reader(csv_file, delimiter=',', ))
-        #     reader2 = list(csv.reader(csv_file2, delimiter=',', ))
-
-        #     reader = reader1[1:]
-
-        #     names = reader1[0][5:]
-        #     headers = reader1[1][5:]
-            
-        #     # print (names, headers)
-        #     for r in reader[1:]:
-        #         arr = r[5:]
-        #         print (r[0], r[5:])
-
-        #         r[0] = r[0].strip()
-        #         if (r[0]=="金成泰" or r[0]=="金聖泰" or r[0] == "崔敬煥" or r[0] == "崔炅煥"):
-        #             p = Person.objects.get(name_cn=r[0])
-        #         else:
-        #             p = Person.objects.get(name=r[0])
-        #         active = p.active 
-        #         info = active.major_bill
-                
-        #         for i, v in enumerate(headers):
-        #             val = {
-        #                 "bill_id": str(v), 
-        #                 "title": names[i],
-        #                 "vote": arr[i]
-        #             }
-        #             info.append(val)
-        #         active.major_bill = info
-        #         active.save()
-
         return Response({"data": [] })
-
 

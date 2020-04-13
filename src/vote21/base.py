@@ -42,6 +42,7 @@ PROJECT_APPS = [
     "users",
     "district",
     "lawmaker",
+    "bills",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -134,11 +135,16 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
     ),
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',)
-}
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+}   
+
+JSON_DIR = env("JSON_DIR")
+CSV_DIR = env("CSV_DIR")
 
 # Auth
-
 AUTH_USER_MODEL = "users.User"
 
 # Sentry
