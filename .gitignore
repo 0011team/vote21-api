@@ -103,3 +103,7 @@ static/
 
 # .dstore
 *.DS_Store
+
+
+# wsgi file
+src/vote21/wsgi.py
