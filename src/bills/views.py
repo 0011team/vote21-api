@@ -26,8 +26,6 @@ class BillDetailView(APIView):
             return Response({"data": json_data })
         except:
             return Response({"msg": "해당 정보가 존재하지 않습니다."}, status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"msg": "잘못된 접근입니다."}, status.HTTP_400_BAD_REQUEST)
 
 
 class BillListView(APIView):
