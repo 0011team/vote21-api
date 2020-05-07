@@ -19,14 +19,13 @@ class BillDetailView(APIView):
 
     permission_classes = (permissions.AllowAny,)
     def get(self, request, *args, **kwargs):
-        if (self.kwargs['assembly_id']):
-            try: 
-                json_dir = JSON_DIR
-                with open( JSON_DIR + '{}.json'.format(self.kwargs['bill_id']), newline='') as json_file:
-                    json_data = json.load(json_file)
-                return Response({"data": json_data })
-            except:
-                return Response({"msg": "해당 정보가 존재하지 않습니다."}, status.HTTP_400_BAD_REQUEST)
+        try: 
+            json_dir = JSON_DIR
+            with open( JSON_DIR + '{}.json'.format(self.kwargs['bill_id']), newline='') as json_file:
+                json_data = json.load(json_file)
+            return Response({"data": json_data })
+        except:
+            return Response({"msg": "해당 정보가 존재하지 않습니다."}, status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"msg": "잘못된 접근입니다."}, status.HTTP_400_BAD_REQUEST)
 

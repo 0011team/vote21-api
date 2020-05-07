@@ -140,5 +140,18 @@ class LawmakerPushView(APIView):
 
     permission_classes = (permissions.AllowAny,)
     def get(self, request, format=None):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
+        with open( base_dir + '/major_bill_keyword_200412.csv', newline='') as csv_file:
+            reader = list(csv.reader(csv_file, delimiter=',', ))
+            reader = reader[1:]
+            
+            for r in reader:
+                if (r[-1] == 0):
+                    print (r[0], r[1])
+            
+        # actvs = ActiveLawMaker.objects.all().exclude(major_bill=json.dumps({}))[:3]
+        # for i, a in enumerate(actvs):
+        #     print ( i, a.id, a.major_bill )
         return Response({"data": [] })
 
